@@ -1,13 +1,15 @@
 package ru.olegsvs.excel_reader;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -17,7 +19,13 @@ import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 
-import java.io.InputStream;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,14 +49,86 @@ public class MainActivity extends AppCompatActivity {
 
     TextView tvSBM8,tvSBM16,tvSBMMinus;
 
+    int numberOfSheets;
+    String[] sheetNames;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        findViews();
+        if (NetworkUtils.isNetworkAvailable(this)) {
+            findViews();
+            DownloadTask dt = new DownloadTask();
+            dt.execute();
+            onReadClick(-1);
+            loadSpinner();
+        } else {
+            Toast.makeText(this, "Проверьте свое интернет соединение!\nБудет произведена попытка загрузить локальную копию.", Toast.LENGTH_LONG).show();
+            findViews();
+            onReadClick(-1);
+            loadSpinner();
+        }
+    }
 
-        onReadClick(null);
+    private void loadSpinner() {
+        Spinner spinner = (Spinner) findViewById(R.id.sheets);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, sheetNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                onReadClick(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        };
+
+        spinner.setOnItemSelectedListener(itemSelectedListener);
+        spinner.setSelection(sheetNames.length-1);
+    }
+
+    private class DownloadTask extends AsyncTask {
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            String url = "https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/09yVMrEI3NkQKs";
+            try {
+                saveUrl("/data/data/ru.olegsvs.excel_reader/xls", url);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.i("ExcelReader", "DownloadTask: " + e.toString());
+            }
+            return null;
+        }
+    }
+
+    public void saveUrl(final String filename, final String urlString)
+            throws MalformedURLException, IOException {
+        BufferedInputStream in = null;
+        FileOutputStream fout = null;
+        try {
+            in = new BufferedInputStream(new URL(urlString).openStream());
+            fout = new FileOutputStream(filename);
+
+            final byte data[] = new byte[1024];
+            int count;
+            while ((count = in.read(data, 0, 1024)) != -1) {
+                fout.write(data, 0, count);
+            }
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            if (fout != null) {
+                fout.close();
+            }
+        }
     }
 
     private void findViews() {
@@ -81,18 +161,30 @@ public class MainActivity extends AppCompatActivity {
         tvTotalMinus = (TextView) findViewById(R.id.TotalMinus);
     }
 
-    public void onReadClick(View view) {
-        InputStream stream = getResources().openRawResource(R.raw.test1);
+    public void onReadClick(int t) {
+        File excelFile = new File("/data/data/ru.olegsvs.excel_reader/xls");
+        FileInputStream fis = null;
         try {
-            workbook = new HSSFWorkbook(stream);
-            sheet = workbook.getSheetAt(4);
-            int rowsCount = sheet.getPhysicalNumberOfRows();
+            fis = new FileInputStream(excelFile);
+            workbook = new HSSFWorkbook(fis);
+            numberOfSheets = workbook.getNumberOfSheets();
+            sheetNames = new String[numberOfSheets];
+            Log.i("ExcelReader", "onReadClick: " + numberOfSheets);
+
+            for (int i = 0; i < numberOfSheets; i++) {
+                Log.i("ExcelReader", "onReadClick: " + workbook.getSheetName(i));
+                sheetNames[i] = workbook.getSheetName(i);
+            }
+
+            if(t==-1)
+            sheet = workbook.getSheetAt(numberOfSheets-1);
+            else sheet = workbook.getSheetAt(t);
             formulaEvaluator = workbook.getCreationHelper().createFormulaEvaluator();
 
             loadCells();
         } catch (Exception e) {
             /* proper exception handling to be here */
-//            printlnToUser(e.toString());
+            Log.i("ExcelReader", "onReadClick: " + e.toString());
         }
     }
 
@@ -141,32 +233,6 @@ public class MainActivity extends AppCompatActivity {
         return value;
     }
 
-//    public void onWriteClick(View view) {
-//        printlnToUser("writing xlsx file");
-//        XSSFWorkbook workbook = new XSSFWorkbook();
-//        XSSFSheet sheet = workbook.createSheet(WorkbookUtil.createSafeSheetName("mysheet"));
-//        for (int i=0;i<10;i++) {
-//            Row row = sheet.createRow(i);
-//            Cell cell = row.createCell(0);
-//            cell.setCellValue(i);
-//        }
-//        String outFileName = "filetoshare.xlsx";
-//        try {
-//            printlnToUser("writing file " + outFileName);
-//            File cacheDir = getCacheDir();
-//            File outFile = new File(cacheDir, outFileName);
-//            OutputStream outputStream = new FileOutputStream(outFile.getAbsolutePath());
-//            workbook.write(outputStream);
-//            outputStream.flush();
-//            outputStream.close();
-//            printlnToUser("sharing file...");
-//            share(outFileName, getApplicationContext());
-//        } catch (Exception e) {
-//            /* proper exception handling to be here */
-//            printlnToUser(e.toString());
-//        }
-//    }
-
     protected String getCellAsString(Row row, int c, FormulaEvaluator formulaEvaluator) {
         String value = "";
         try {
@@ -197,25 +263,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (NullPointerException e) {
             /* proper error handling should be here */
-//            printlnToUser(e.toString());
-        }
+            Log.i("ExcelReader", "getCellAsString: " + e.toString());        }
         return value;
     }
-
-//    /**
-//     * print line to the output TextView
-//     * @param str
-//     */
-//    private void printlnToUser(String str) {
-//        final String string = str;
-//        if (output.length()>8000) {
-//            CharSequence fullOutput = output.getText();
-//            fullOutput = fullOutput.subSequence(5000,fullOutput.length());
-//            output.setText(fullOutput);
-//            output.setSelection(fullOutput.length());
-//        }
-//        output.append(string+"\n");
-//    }
-
-
 }
