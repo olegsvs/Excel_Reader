@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
             if(file.exists()) {
                 Toast.makeText(this, "Проверьте свое интернет соединение!\nБудет произведена попытка загрузить локальную копию.", Toast.LENGTH_LONG).show();
                 onReadClick(-1);
+                loadSpinner();
             } else Toast.makeText(this, "Проверьте свое интернет соединение!", Toast.LENGTH_LONG).show();
         }
     }
@@ -110,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void v)  {
             super.onPostExecute(v);
             onReadClick(-1);
+            loadSpinner();
         }
     }
 
@@ -230,7 +232,6 @@ public class MainActivity extends AppCompatActivity {
         tvTotal16.setText(loadRow(3,9));
         tvTotalMinus.setText(loadRow(4,9));
 
-        loadSpinner();
     }
 
     private String loadRow(int i, int i1) {
