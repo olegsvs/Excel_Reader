@@ -57,17 +57,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        findViews();
         if (NetworkUtils.isNetworkAvailable(this)) {
-            findViews();
             DownloadTask dt = new DownloadTask();
             dt.execute();
-            onReadClick(-1);
-            loadSpinner();
         } else {
-            Toast.makeText(this, "Проверьте свое интернет соединение!\nБудет произведена попытка загрузить локальную копию.", Toast.LENGTH_LONG).show();
-            findViews();
-            onReadClick(-1);
-            loadSpinner();
+            File file = new File("/data/data/ru.olegsvs.excel_reader/xls");
+            if(file.exists()) {
+                Toast.makeText(this, "Проверьте свое интернет соединение!\nБудет произведена попытка загрузить локальную копию.", Toast.LENGTH_LONG).show();
+                onReadClick(-1);
+            } else Toast.makeText(this, "Проверьте свое интернет соединение!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -93,11 +92,11 @@ public class MainActivity extends AppCompatActivity {
         spinner.setSelection(sheetNames.length-1);
     }
 
-    private class DownloadTask extends AsyncTask {
+    private class DownloadTask extends AsyncTask< Void, Void, Void >  {
 
         @Override
-        protected Object doInBackground(Object[] objects) {
-            String url = "https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/09yVMrEI3NkQKs";
+        protected Void doInBackground(Void... voids) {
+            String url = "";
             try {
                 saveUrl("/data/data/ru.olegsvs.excel_reader/xls", url);
             } catch (IOException e) {
@@ -105,6 +104,12 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("ExcelReader", "DownloadTask: " + e.toString());
             }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v)  {
+            super.onPostExecute(v);
+            onReadClick(-1);
         }
     }
 
@@ -224,6 +229,8 @@ public class MainActivity extends AppCompatActivity {
         tvTotal8.setText(loadRow(2,9));
         tvTotal16.setText(loadRow(3,9));
         tvTotalMinus.setText(loadRow(4,9));
+
+        loadSpinner();
     }
 
     private String loadRow(int i, int i1) {
