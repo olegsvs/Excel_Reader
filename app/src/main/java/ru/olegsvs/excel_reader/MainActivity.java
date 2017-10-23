@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
     TextView tvSBM8,tvSBM16,tvSBMMinus;
 
+    TextView tvSarapul8,tvSarapul16,tvSarapulMinus;
+
     int numberOfSheets;
     String[] sheetNames;
 
@@ -166,6 +168,11 @@ public class MainActivity extends AppCompatActivity {
         tvTotal8 = (TextView) findViewById(R.id.Total8);
         tvTotal16 = (TextView) findViewById(R.id.Total16);
         tvTotalMinus = (TextView) findViewById(R.id.TotalMinus);
+
+        tvSarapul8 = (TextView) findViewById(R.id.Sarapul8);
+        tvSarapul16 = (TextView) findViewById(R.id.Sarapul16);
+        tvSarapulMinus = (TextView) findViewById(R.id.SarapulMinus);
+
     }
 
     public void onReadClick(int t) {
@@ -227,10 +234,15 @@ public class MainActivity extends AppCompatActivity {
         tvNeft16.setText(loadRow(3,8));
         tvNeftMinus.setText(loadRow(4,8));
 
+        //Sarapul
+        tvSarapul8.setText(loadRow(2,9));
+        tvSarapul16.setText(loadRow(3,9));
+        tvSarapulMinus.setText(loadRow(4,9));
+
         //Total
-        tvTotal8.setText(loadRow(2,9));
-        tvTotal16.setText(loadRow(3,9));
-        tvTotalMinus.setText(loadRow(4,9));
+        tvTotal8.setText(loadRow(2,10));
+        tvTotal16.setText(loadRow(3,10));
+        tvTotalMinus.setText(loadRow(4,10));
 
     }
 
@@ -246,14 +258,12 @@ public class MainActivity extends AppCompatActivity {
         try {
             Cell cell = row.getCell(c);
             CellValue cellValue = formulaEvaluator.evaluate(cell);
-            Log.i("DribbbleApp", "getCellAsString: cell" + cellValue);
             switch (cellValue.getCellType()) {
                 case Cell.CELL_TYPE_BOOLEAN:
                     value = ""+cellValue.getBooleanValue();
                     break;
                 case Cell.CELL_TYPE_NUMERIC:
                     double numericValue = cellValue.getNumberValue();
-                    Log.i("DribbbleApp", "getCellAsString: numeric" + numericValue);
                     if(HSSFDateUtil.isCellDateFormatted(cell)) {
                         double date = cellValue.getNumberValue();
                         SimpleDateFormat formatter =
