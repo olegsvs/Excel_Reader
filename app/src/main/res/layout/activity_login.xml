@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="ru.olegsvs.excel_reader.LoginActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="10dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            android:src="@drawable/lock"
+            android:tint="@color/colorPrimary"
+            android:contentDescription="lockImage"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingTop="10dp">
+
+        <EditText
+            android:maxLength="8"
+            android:gravity="center"
+            android:id="@+id/edPass"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:clickable="false"
+            android:textSize="24sp"
+            android:focusable="false"/>
+
+
+        <android.support.v7.widget.GridLayout
+            android:id="@+id/gridLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:weightSum="3"
+            app:columnCount="3"
+            app:orientation="horizontal">
+
+            <Button
+                android:onClick="click1"
+                android:text="1"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1"/>
+
+            <Button
+                android:onClick="click2"
+                android:text="2"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1"/>
+
+            <Button
+                android:onClick="click3"
+                android:text="3"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1"/>
+
+            <Button
+                android:onClick="click4"
+                android:text="4"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1"/>
+
+            <Button
+                android:onClick="click5"
+                android:text="5"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1"/>
+
+            <Button
+                android:onClick="click6"
+                android:text="6"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1"/>
+
+            <Button
+                android:onClick="click7"
+                android:text="7"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1"/>
+
+            <Button
+                android:onClick="click8"
+
+                android:text="8"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1"/>
+
+            <Button
+                android:onClick="click9"
+                android:text="9"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1"/>
+
+            <Button
+                android:onClick="click0"
+                android:text="0"
+                app:layout_column="1"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1"/>
+
+            <Button
+                android:id="@+id/delBtn"
+                android:onClick="delBtnClick"
+                android:text="DEL"
+                app:layout_column="0"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1"/>
+
+            <Button
+                android:id="@+id/goBtn"
+                android:enabled="false"
+                android:onClick="goBtnClick"
+                android:text="GO"
+                app:layout_column="2"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1"/>
+        </android.support.v7.widget.GridLayout>
+    </LinearLayout>
+</LinearLayout>
