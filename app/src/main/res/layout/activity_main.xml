@@ -8,9 +8,11 @@
 
         <ImageView
             android:id="@+id/imageView"
+            android:layout_alignParentTop="true"
             android:layout_width="match_parent"
             android:layout_height="85dp"
-            android:scaleType="fitCenter"
+            android:background="@color/colorAccent"
+            android:onClick="onLogoClick"
             app:srcCompat="@drawable/logo"/>
 
         <android.support.v7.widget.RecyclerView

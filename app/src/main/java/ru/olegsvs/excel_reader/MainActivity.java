@@ -1,6 +1,9 @@
 package ru.olegsvs.excel_reader;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -47,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     HSSFSheet sheet;
     private RecyclerView excelRecycler;
     List<ExcelItem> excelItems = new ArrayList<ExcelItem>();
+    private SharedPreferences prefs;
+    private String URL;
 
     int numberOfSheets;
     String[] sheetNames;
@@ -55,11 +60,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
 
         excelRecycler = findViewById(R.id.excel_book);
         excelRecycler.setNestedScrollingEnabled(false);
+
+        prefs = this.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        URL ="https://getfile.dokpub.com/yandex/get/" + prefs.getString("URL", "");
 
         if (NetworkUtils.isNetworkAvailable(this)) {
             DownloadTask dt = new DownloadTask();
@@ -70,17 +76,21 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Проверьте свое интернет соединение!\nБудет произведена попытка загрузить локальную копию.", Toast.LENGTH_LONG).show();
                 onReadClick(-1);
                 loadSpinner();
-            } else Toast.makeText(this, "Проверьте свое интернет соединение!", Toast.LENGTH_LONG).show();
+            } else Toast.makeText(this, "Проверьте свое интернет соединение или ссылку на файл!", Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void onLogoClick(View view) {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     private class DownloadTask extends AsyncTask< Void, Void, Void >  {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            String url = "https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/GfG-WHJu3T2ZJx";
             try {
-                saveUrl("/data/data/ru.olegsvs.excel_reader/xls", url);
+                saveUrl("/data/data/ru.olegsvs.excel_reader/xls", URL);
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.i("ExcelReader", "DownloadTask: " + e.toString());
@@ -127,10 +137,8 @@ public class MainActivity extends AppCompatActivity {
             workbook = new HSSFWorkbook(fis);
             numberOfSheets = workbook.getNumberOfSheets();
             sheetNames = new String[numberOfSheets];
-            Log.i("ExcelReader", "onReadClick1: " + numberOfSheets);
 
             for (int i = 0; i < numberOfSheets; i++) {
-                Log.i("ExcelReader", "onReadClick2: " + workbook.getSheetName(i));
                 sheetNames[i] = workbook.getSheetName(i);
             }
 
@@ -143,11 +151,6 @@ public class MainActivity extends AppCompatActivity {
             /* proper exception handling to be here */
             Log.i("ExcelReader", "onReadClick3: " + e.toString());
         }
-    }
-
-    private void loadDates() {
-        Log.i("IDDQD2", "loadDates: " + sheetNames[0]);
-        Log.i("IDDQD2", "loadDates: " + sheetNames[sheetNames.length-1]);
     }
 
     private void loadCells() {
@@ -186,12 +189,19 @@ public class MainActivity extends AppCompatActivity {
             value = ""+cell.getStringCellValue();
         } catch (NullPointerException e) {
             /* proper error handling should be here */
-            Log.i("ExcelReader", "getCellAsString: " + e.toString());        }
+            Log.i("IDDQD", "getCellAsString: " + e.toString());        }
         return value;
     }
 
     private void loadSpinner() {
         Spinner spinner = (Spinner) findViewById(R.id.sheets);
+
+        if(sheetNames == null) {
+            Toast.makeText(this, "Проверьте ссылку на XLS", Toast.LENGTH_LONG).show();
+            onLogoClick(null);
+            return;
+        }
+
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, sheetNames);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
