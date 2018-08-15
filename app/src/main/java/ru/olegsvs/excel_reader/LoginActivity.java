@@ -21,6 +21,21 @@ public class LoginActivity extends AppCompatActivity {
     int type;
     Button mGoBtn, mDelBtn;
     EditText mEdPass;
+    private final TextWatcher mTextEditorWatcher = new TextWatcher() {
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (s.length() >= 4) mGoBtn.setEnabled(true);
+            else mGoBtn.setEnabled(false);
+            mEdPass.setSelection(mEdPass.getText().length());
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+
+        }
+    };
     String pass = "";
     String pass2 = "";
     int count = 0;
@@ -32,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (getIntent().getExtras() != null) {
             type = getIntent().getExtras().getInt("type", 0);
-            if(type == 1) {
+            if (type == 1) {
                 pass = "";
                 setPrefs(pass);
             }
@@ -58,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
     private void getPrefs() {
         SharedPreferences sharedPref = getSharedPreferences("prefs", Context.MODE_PRIVATE);
         pass = sharedPref.getString("pass", "");
-        if(TextUtils.isEmpty(pass)) type = typeFirst;
+        if (TextUtils.isEmpty(pass)) type = typeFirst;
         if (type == typeFirst) {
             mEdPass.setHint("Установите новый пароль (от 4 до 8 символов)");
         } else {
@@ -158,22 +173,6 @@ public class LoginActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(text))
             mEdPass.setText(text.substring(0, text.length() - 1));
     }
-
-    private final TextWatcher mTextEditorWatcher = new TextWatcher() {
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if (s.length() >= 4) mGoBtn.setEnabled(true);
-            else mGoBtn.setEnabled(false);
-            mEdPass.setSelection(mEdPass.getText().length());
-        }
-
-        @Override
-        public void afterTextChanged(Editable editable) {
-
-        }
-    };
 
     @Override
     public void onBackPressed() {

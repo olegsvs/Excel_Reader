@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="ru.olegsvs.excel_reader.SettingsActivity">
+
+    <EditText
+        android:id="@+id/url_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="url файла"/>
+
+    <EditText
+        android:id="@+id/col1_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Колонка 1"/>
+
+    <EditText
+        android:id="@+id/col2_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Колонка 2"/>
+
+    <EditText
+        android:id="@+id/col3_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Колонка 3"/>
+
+    <Button
+        android:text="Сохранить"
+        android:onClick="onSaveClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:text="Отмена"
+        android:onClick="onCancelClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
